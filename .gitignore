@@ -1,0 +1,12 @@
+# for the executable files
+*
+!/**/
+!*.*
+
+# other
+**/.DS_Store
+Configurations/*.txt
+Init/*.txt
+Results/*.txt
+log*
+*.txt
