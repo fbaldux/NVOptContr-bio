@@ -97,10 +97,11 @@ s = ifft(sF, norm='ortho').real
 
 s_Ising = np.sign(s).astype(np.int_)
 
+"""
 ft = open("times.txt", 'a')
 ft.write("%f " % (time()-start))
 ft.close()
-
+"""
 
 #  -------------------------------------------  plot  ------------------------------------------  #
 """

@@ -1,16 +1,12 @@
-function mytime() {
-    perl -MTime::HiRes=time -e 'printf "%.9f\n", time' 
-    #echo "from time import time; print(time())" | python
-}
 
 rm Configurations/* Init/* Results/*
 
 # time parameters
-Tfin=16.       # final time of the experiments
-Delta_t=0.02       # pi-pulse distance
+#Tfin=10.       # final time of the experiments
+Delta_t=0.01       # pi-pulse distance
 
 # noise parameters
-alpha=1.5
+#alpha=0
 
 # annealing parameters
 annSteps=1e3       # number of steps in the temperature ramp
@@ -18,39 +14,36 @@ MCsteps=1       # number of MC steps at each ramp level
 T0=0.01       # initial temperature
 Reps=1       # number of states to sample
 
-time0=$(mytime)
 
-#if g++ -o J J_experiment.cpp -lm
-if g++ -o J J_1f.cpp -lm
-then
-    ./J $Tfin $Delta_t $alpha
-    echo "J done" $( echo "$(mytime) - $time0" | bc -l )
-fi
+g++ -o J J_C13_1f.cpp -lm
+g++ -o h h_microtub.cpp -lm
+g++ -o SA SA_from_spherical.cpp -lm -std=c++11
 
 
-#if g++ -o h h_neuron.cpp -lm
-if g++ -o h h_microtub.cpp -lm
-then
+for Tfin in 20 #$(seq 1 1 16)
+do
     ./h $Tfin $Delta_t
-    echo "h done" $( echo "$(mytime) - $time0" | bc -l )
-fi
-
-
-python3 spherical_FFT.py $Tfin $Delta_t $alpha && echo "spherical done" $( echo "$(mytime) - $time0" | bc -l )
-
-
-if g++ -o SA SA_from_spherical.cpp -lm -std=c++11
-then
-    ./SA $Tfin $Delta_t $alpha $annSteps $MCsteps $T0 $Reps &
-    wait
     
-    echo "SA done" $( echo "$(mytime) - $time0" | bc -l )
-fi
+    for alpha in 1
+    do
+        #(
+        ./J $Tfin $Delta_t $alpha
+    
+        python3 spherical_FFT.py $Tfin $Delta_t $alpha
+
+        ./SA $Tfin $Delta_t $alpha $annSteps $MCsteps $T0 $Reps > E_${Tfin}_${Delta_t}_$alpha.txt
+    
+        python plot_Fourier.py $Tfin $Delta_t $alpha &
+    
+        #echo "Done Tfin=$Tfin"
+        #)&
+    done
+    wait
+done
 rm J h SA
 
 #python3 scatter.py $Tfin $Delta_t &
 
-python noisePlot.py $Tfin $Delta_t $alpha &
 
 
 

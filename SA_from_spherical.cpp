@@ -267,6 +267,8 @@ void anneal(int *s, int *best_s, EStruct *E){
                 DW.at(DW_ind) += 2*direction-1;
             }
             
+            cout << E->tot << endl;
+            
             // keep track of the best configuration so far
             if (E->tot < best_E) {
                 best_E = E->tot;

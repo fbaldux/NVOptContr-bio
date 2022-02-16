@@ -2,8 +2,7 @@
 
     The program computes the field h for the spin glass Hamiltonian. The field represents
     the signal to be detected.
-    
-    Currently, the supported option is a gaussian in time.
+    The action potential of the neuron is modeled as a gaussian in time.
 
 //  -------------------------------------------------------------------------------------------  */
 

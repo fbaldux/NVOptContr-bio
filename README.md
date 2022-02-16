@@ -1,27 +1,50 @@
 # OptControl-SimAnneal
 
-Simulated annealing schedule for the optimal control problem of NV centers in diamond (here specified to target the action potential of a neuron pulse). 
+Simulated annealing schedules for the optimal control problem of NV centers in diamond. Here, it is specified to target biological signals: the action potential of a neuron pulse, or the signal of a system of microtubules.
 
 
----
----
-## Programs
 
----
-### h\_neuron.cpp
+## anneal.sh
+
+This shell runs the codes to
+
+- compute the vectors `h[i]` and `J[i,j]` (for the experimental setup)
+- perform many annealing cycles with `SA.cpp`, starting at high temperature from a random state. By default, it uses several values of K (the ferromagnetic coupling) parallelizing to different CPUs.
+
+
+## exact+anneal.sh
+
+This shell runs the codes to
+
+- compute the vectors `h[i]` and `J[i,j]` (for the experimental setup)
+- compute the exact solution with `spherical_FFT.py`
+- perform some annealing cycles with `SA_from_spherical.cpp`, starting at low temperature from the exact solution.
+
+
+## h\_microtub.cpp
 
 The program computes the field h for the spin glass Hamiltonian. The field represents the signal to be detected.  
-Currently, the supported option is a gaussian in time.
+The microtubule field is represented by a 5-frequency signal.
 
 
----
-### J\_experiment.cpp
+## h\_neuron.cpp
 
-The program computes the couplings J for the spin glass Hamiltonian. The couplings represent the noise to be filtered out.
+The program computes the field h for the spin glass Hamiltonian. The field represents the signal to be detected.  
+The action potential of the neuron is modeled as a gaussian in time.
 
 
----
-### SA.cpp
+## J\_C13\_1f.cpp
+
+The program computes the couplings J for the spin glass Hamiltonian. The couplings represent the noise to be filtered out.  
+The noise sources are the C13 impurities in the diamond, and a 1/f^alpha noise coming from the biological sample. Setting alpha=0 removes the 1/f part of the noise. 
+
+
+## plot\_{...}.py
+
+Just to plot the results.
+
+
+## SA.cpp
 
 The program anneals a random configuration of Ising spins s[i]=+/-1, according to the cost function
 
@@ -34,8 +57,7 @@ The program anneals a random configuration of Ising spins s[i]=+/-1, according t
 - The # of pulses and 1/eta for each configuration are saved to a file in Results/
 
 
----
-### SA\_from\_spherical.cpp
+## SA\_from\_spherical.cpp
 
 The program anneals a random configuration of Ising spins s[i]=+/-1, according to the cost function
 
@@ -49,8 +71,12 @@ The program anneals a random configuration of Ising spins s[i]=+/-1, according t
 - The # of pulses and 1/eta for each configuration are saved to a file in Results/
 
 
----
-### spherical\_FFT.py
+## scatter.py
+
+The program plots the sensitivities for all the values of K found in Results/
+
+
+## spherical\_FFT.py
 
 The program finds the configuration of _continuous_ spins `s[i]` that minimezes the cost function
    
@@ -58,50 +84,6 @@ The program finds the configuration of _continuous_ spins `s[i]` that minimezes 
 
 - The variables `J[i,j]` and `h[i]` are loaded from Init/
 - From the continuous spins are generated _Ising_ spins `s_Ising[i] = sign(s[i])`, that are then saved to Configurations/, with the # of pulses and 1/eta in the header.
-
-
----
-### spherical\_diag.py
-
-The program finds the configuration of _continuous_ spins `s[i]` that minimezes the cost function
-   
-      H = 0.5 sum_ij J[i,j] s[i] s[j] - log |sum_i h[i] s[i]| - lamda ( sum_i s[i]**2 - N )
-
-- The variables `J[i,j]` and `h[i]` are loaded from Init/
-- Exact diagonalization is used instead of the FFT.
-- From the continuous spins are generated _Ising_ spins `s_Ising[i] = sign(s[i])`, that are then saved to Configurations/, with the # of pulses and 1/eta in the header.
-
-
----
----
-## Shells
-
----
-### anneal.sh
-
-This shell runs the codes to
-
-- compute the vectors `h[i]` and `J[i,j]` (for the experimental setup)
-- perform many annealing cycles with `SA.cpp`, starting at high temperature from a random state. By default, it uses several values of K (the ferromagnetic coupling) parallelizing to different CPUs.
-
-
----
-### exact.sh
-
-This shell runs the codes to
-
-- compute the vectors `h[i]` and `J[i,j]` (for the experimental setup)
-- compute the exact solution with `spherical_FFT.py`
-
-
----
-### exact+anneal.sh
-
-This shell runs the codes to
-
-- compute the vectors `h[i]` and `J[i,j]` (for the experimental setup)
-- compute the exact solution with `spherical_FFT.py`
-- perform some annealing cycles with `SA_from_spherical.cpp`, starting at low temperature from the exact solution.
 
 
 

@@ -2,8 +2,7 @@
 
     The program computes the field h for the spin glass Hamiltonian. The field represents
     the signal to be detected.
-    
-    Currently, the supported option is a gaussian in time.
+    The microtubule field is represented by a 5-frequency signal.
 
 //  -------------------------------------------------------------------------------------------  */
 

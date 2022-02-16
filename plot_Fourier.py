@@ -1,6 +1,6 @@
 import sys
 import numpy as np
-from scipy.fft import fft,ifft,fftshift, fftfreq
+from scipy.fft import fft,ifft,fftshift,fftfreq
 from matplotlib import pyplot as plt
 
 Tfin = float( sys.argv[1] )
@@ -9,7 +9,7 @@ alpha = float( sys.argv[3] )
 
 N = int( Tfin / Delta_t )
 
-A = 0.5
+A = 1
 
 
 #  ----------------------------------------  utilities  ----------------------------------------  #
@@ -22,19 +22,19 @@ def gaussian(x,sigma2):
 
 
 signal_freq = np.array((9.5,15.,18.,25.,31.))
-signal_ampl = np.array((0.2,0.2,0.2,0.2,0.2))
-signal_width = np.array((0.1,0.1,0.1,0.1,0.1))
+signal_ampl = np.ones(5) * 0.2
+signal_width = np.ones(5) * 0.1
 
 def signalF(nu):
     temp = 0.
     
     for i in range(5):
-        temp += 0.2 * gaussian(nu-signal_freq[i],signal_width[i]**2)
+        temp += signal_ampl[i] * gaussian(nu-signal_freq[i],signal_width[i]**2)
         
     return temp
 
 
-nu = np.linspace(0.01,40,10000)
+nu = np.linspace(0.01,35,10000)
 plt.plot(nu, signalF(nu), '-', label='signal')
 
 
@@ -54,7 +54,7 @@ def noiseF(nu):
     
     return temp
 
-nu = np.linspace(0.01,40,10000)
+nu = np.linspace(0.01,35,10000)
 plt.plot(nu, noiseF(nu), '-', label='noise')
 
 
@@ -75,21 +75,49 @@ plt.plot(nu[:N//2], np.abs(filtF[:N//2]), '-', label='spherical')
 filename = "Configurations/s_T%.4f_dt%.4f_a%.4f_K%.4f_r%d.txt" % (Tfin,Delta_t,alpha,0,0)
 filt = np.loadtxt(filename)
 
-filtF = fft(filt, norm='forward')
+# find eta
+f = open(filename, 'r')
+head = f.readline()
+f.close()
+pos_equal = [i for i in range(len(head)) if head.startswith("=", i)]
+etaInv = float( head[pos_equal[1]+1:-1] )
 
-nu = fftfreq(N, d=Delta_t)
-plt.plot(nu[:N//2], np.abs(filtF[:N//2]), '-', label='filter')
+filtF = fftshift(fft(filt, norm='forward'))
+
+nu = fftshift(fftfreq(N, d=Delta_t))
+plt.plot(nu[N//2:], np.abs(filtF[N//2:]), '-', label='filter')
+#plt.plot(nu[N//2:], np.real(filtF[N//2:]), '-', label='filter')
+
+"""
+ts = np.arange(N+1)*Delta_t
+nu = np.linspace(0.01,35,1000)
+filtF = np.zeros(len(nu))
+for inu in range(len(nu)):
+    #filtF[inu] = np.sum(filt*np.cos(2*np.pi*nu[inu]*np.arange(1,N+1)*Delta_t)) * Delta_t
+    filtF[inu] = np.sum(filt * (np.sin(2*np.pi*nu[inu]*ts[1:]) - np.sin(2*np.pi*nu[inu]*ts[:-1])) ) / (2*np.pi*nu[inu])
+
+plt.plot(nu, filtF, '-', label='filter')
 
 
+filt = np.repeat(filt, 2)
+filtF = fftshift(fft(filt, norm='forward'))
+
+nu = fftshift(fftfreq(2*N, d=Delta_t/2))
+plt.plot(nu[N:], np.abs(filtF[N:]), '-', label='filter')
+"""
 #  -------------------------------------------  plot  ------------------------------------------  #
 
 
 
 
-plt.xlabel(r"$\nu$")
+plt.xlabel(r"$\nu$ [MHz]")
+plt.ylabel(r"amplitude")
 
-plt.ylim((-0.01,1.02))
+plt.xlim((-1,35))
+plt.ylim((-0.01,0.9))
 
-plt.legend()
+plt.title(r"$T$=%.2f $\mu$s, $\Delta t$=%.2f $\mu$s, $\alpha$=%.2f; $\eta^{-1}$=%.2f" % (Tfin,Delta_t,alpha, etaInv))
+
+plt.legend(loc="upper right")
 plt.show()
 

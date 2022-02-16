@@ -15,7 +15,7 @@
 using namespace std;
 
 // global variables
-#define amplNoise 0.5
+#define amplNoise 0.1
 int N;
 double Tfin, Delta_t, invDt, alpha;
 
@@ -129,7 +129,7 @@ int main( int argc, char *argv[] ) {
         Js[k] = J_trapzInt(S1, k, 2.4517*Delta_t, 2.9795*Delta_t);
         Js[k] += J_trapzInt(S2, k, 0.001*Delta_t, 6.5*Delta_t);
         if (alpha > 0.) {
-            Js[k] += J_trapzInt(S3, k, 0.001*Delta_t, 10*Delta_t);
+            Js[k] += J_trapzInt(S3, k, 0.001*Delta_t, 35*Delta_t);
         }
     }
     
