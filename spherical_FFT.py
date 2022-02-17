@@ -23,13 +23,14 @@ from time import time
 Tfin = float( sys.argv[1] )
 Delta_t = float( sys.argv[2] )
 alpha = float( sys.argv[3] )
+amplNoise = float( sys.argv[4] )
 
 N = int( Tfin / Delta_t )
 
 
 #  ------------------------------------------  import  -----------------------------------------  #
 
-J = np.loadtxt("Init/J_T%.4f_dt%.4f_a%.4f.txt" % (Tfin,Delta_t,alpha))
+J = np.loadtxt("Init/J_T%.4f_dt%.4f_a%.4f_A%.2e.txt" % (Tfin,Delta_t,alpha,amplNoise))
 Jmat = toeplitz(J)
 
 # to have decay both for positive and negative indices
@@ -140,7 +141,7 @@ def etaInv(epsilon):
 
 #  ---------------------------------------  save to file  --------------------------------------  #
 
-filename = "Configurations/sSpher_T%.4f_dt%.4f_a%.4f.txt" % (Tfin,Delta_t,alpha)
+filename = "Configurations/sSpher_T%.4f_dt%.4f_a%.4f_A%.2e.txt" % (Tfin,Delta_t,alpha,amplNoise)
 head = "pulses=%d, 1/eta=%f" % (domain_walls(s_Ising), etaInv(energy(s_Ising)))
 np.savetxt(filename, s_Ising, header=head, fmt='%d')
 

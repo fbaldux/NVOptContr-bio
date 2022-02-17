@@ -49,7 +49,7 @@ struct EStruct {
 
 // global variables
 int N, tone, harmonic, ann_steps, MC_steps, MC_ramp_step; 
-double Tfin, Delta_t, alpha, T0, K0;
+double Tfin, Delta_t, alpha, amplNoise, T0, K0;
 double *Js, *hs;
 
 
@@ -57,7 +57,7 @@ double *Js, *hs;
 
 void load_J() {
     char filename[100];
-    snprintf(filename, 100, "Init/J_T%.4f_dt%.4f_a%.4f.txt", Tfin, Delta_t, alpha);            
+    snprintf(filename, 100, "Init/J_T%.4f_dt%.4f_a%.4f_A%.2e.txt", Tfin, Delta_t, alpha, amplNoise);
     ifstream infile(filename);
         
     if ( ! infile.is_open() ) {
@@ -103,7 +103,7 @@ void load_h() {
 
 void load_s(int *s) {
     char filename[100];
-    snprintf(filename, 100, "Configurations/sSpher_T%.4f_dt%.4f_a%.4f.txt", Tfin, Delta_t, alpha);         
+    snprintf(filename, 100, "Configurations/sSpher_T%.4f_dt%.4f_a%.4f_A%.2e.txt", Tfin,Delta_t,alpha,amplNoise);         
     ifstream infile(filename);
     
     if ( ! infile.is_open() ) {
@@ -267,7 +267,7 @@ void anneal(int *s, int *best_s, EStruct *E){
                 DW.at(DW_ind) += 2*direction-1;
             }
             
-            cout << E->tot << endl;
+            //cout << E->tot << endl;
             
             // keep track of the best configuration so far
             if (E->tot < best_E) {
@@ -295,7 +295,8 @@ int domain_walls(int *s) {
 
 // sensitivity
 double etaInv(double epsilon) {
-    return 1./exp(epsilon - log(gyro)-0.5*log(Tfin*1e-6));
+    //return 1./exp(epsilon - log(gyro)-0.5*log(Tfin*1e-6));
+    return gyro * sqrt(Tfin) * 1e-3 * exp(-epsilon);
 }
 
 
@@ -304,7 +305,7 @@ double etaInv(double epsilon) {
 void save_s(int *s, int dw, double this_etaInv, int r) {
     // create the output file
     char filename[100];
-    snprintf(filename, 100, "Configurations/s_T%.4f_dt%.4f_a%.4f_K%.4f_r%d.txt", Tfin, Delta_t, alpha, K0, r);        
+    snprintf(filename, 100, "Configurations/s_T%.4f_dt%.4f_a%.4f_A%.2e_K%.4f_r%d.txt", Tfin,Delta_t,alpha,amplNoise,K0,r);        
     ofstream outfile(filename);
     
     if ( ! outfile.is_open() ) {
@@ -330,18 +331,19 @@ int main( int argc, char *argv[] ) {
     EStruct E;
     
     // parameter acquisition
-    if( argc != 8 ) {
-        cerr << "\nError! Usage: ./SA_from_spherical <Tfin> <Delta_t> <alpha> <ann_steps> <MC_steps> <Temp0> <Reps>\n\n";
+    if( argc != 9 ) {
+        cerr << "\nError! Usage: ./SA_from_spherical <Tfin> <Delta_t> <alpha> <amplNoise> <ann_steps> <MC_steps> <Temp0> <Reps>\n\n";
         exit(-1);
     }
     Tfin = strtof(argv[1], NULL);
     Delta_t = strtof(argv[2], NULL);
     alpha = strtof(argv[3], NULL);
-    ann_steps = strtod(argv[4], NULL);
-    MC_steps = strtod(argv[5], NULL);
-    T0 = strtof(argv[6], NULL);
+    amplNoise = strtod(argv[4], NULL);
+    ann_steps = strtod(argv[5], NULL);
+    MC_steps = strtod(argv[6], NULL);
+    T0 = strtof(argv[7], NULL);
     K0 = 0;
-    Reps = strtod(argv[7], NULL);
+    Reps = strtod(argv[8], NULL);
     
     // number of spins
     N = int(Tfin / Delta_t);
@@ -364,7 +366,7 @@ int main( int argc, char *argv[] ) {
  
     // create the output file
     char filename[100];
-    snprintf(filename, 100, "Results/T%.4f_dt%.4f_a%.4f_K%.4f.txt", Tfin, Delta_t, alpha, K0);        
+    snprintf(filename, 100, "Results/T%.4f_dt%.4f_a%.4f_A%.2e_K%.4f.txt", Tfin,Delta_t,alpha,amplNoise,K0);        
     FILE *outfile = fopen(filename, "w");  
     fprintf(outfile, "# N=%d, MC_steps=%d, T0=%f, K=%f\n# pulses 1/eta\n", N, MC_steps, T0, K0);
     

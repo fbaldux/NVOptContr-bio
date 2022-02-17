@@ -9,13 +9,14 @@ import numpy as np
 from matplotlib import pyplot as plt
 from glob import glob
 
-T = float( sys.argv[1] )
-deltat = float( sys.argv[2] )
+Tfin = float( sys.argv[1] )
+Delta_t = float( sys.argv[2] )
+alpha = float( sys.argv[3] )
+amplNoise = float( sys.argv[4] )
 
-L = int(T/deltat)
 
 def filename_func():
-    return "Results/T%.4f_dt%.4f_K?.????.txt" % (T, deltat)
+    return "Results/T%.4f_dt%.4f_a%.4f_A%.2e_K?.????.txt" % (Tfin,Delta_t,alpha,amplNoise)
 
 files = glob(filename_func())
 Ks = np.array([float(f[-10:-4]) for f in files])
@@ -35,7 +36,7 @@ for k in range(len(files)):
     res[k,3] = np.average(data[1])
     res[k,4] = np.std(data[1])
 
-np.savetxt("varK_T%.4f.txt" % T, res, header="K <pulses> std(pulses) <1/eta> std(1/eta)")
+#np.savetxt("varK_T%.4f.txt" % T, res, header="K <pulses> std(pulses) <1/eta> std(1/eta)")
 
 plt.xlabel("# of pulses")
 plt.ylabel(r"1/$\eta$")

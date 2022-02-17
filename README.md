@@ -1,4 +1,4 @@
-# OptControl-SimAnneal
+# OptControl-bio
 
 Simulated annealing schedules for the optimal control problem of NV centers in diamond. Here, it is specified to target biological signals: the action potential of a neuron pulse, or the signal of a system of microtubules.
 
@@ -36,7 +36,25 @@ The action potential of the neuron is modeled as a gaussian in time.
 ## J\_C13\_1f.cpp
 
 The program computes the couplings J for the spin glass Hamiltonian. The couplings represent the noise to be filtered out.  
-The noise sources are the C13 impurities in the diamond, and a 1/f^alpha noise coming from the biological sample. Setting alpha=0 removes the 1/f part of the noise. 
+The noise sources are the C13 impurities in the diamond, and a noise ~ amplNoise/f^alpha coming from the biological sample. Setting amplNoise=0 clearly removes the 1/f part of the noise.
+
+NOTE: the C13 noise is
+
+      S(omega) = S0 + A exp[ -(omega-omegaL)^2 / (2 sigma^2) ]
+
+with
+
+- S0 = 0.00119
+- A = 0.52
+- omegaL = 2 pi 0.4316 = 2.7118
+- sigma  = 2 pi 0.0042 = 0.0264  =>  1/sigma^2 = 1434.8
+
+NOTE: the 1/f noise is divergent at small frequencies, but the divergence is taken care of explicitly.
+
+
+## J\_C13\_1f.py
+
+Program that does the same of the .cpp version, just for checks.
 
 
 ## plot\_{...}.py

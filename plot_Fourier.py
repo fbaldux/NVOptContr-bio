@@ -6,10 +6,10 @@ from matplotlib import pyplot as plt
 Tfin = float( sys.argv[1] )
 Delta_t = float( sys.argv[2] )
 alpha = float( sys.argv[3] )
-
+amplNoise = float( sys.argv[4] )
+K = float( sys.argv[5] )
 N = int( Tfin / Delta_t )
 
-A = 1
 
 
 #  ----------------------------------------  utilities  ----------------------------------------  #
@@ -50,7 +50,7 @@ def noiseF(nu):
 
     # 1/f
     if alpha>0:
-        temp += A / nu**alpha
+        temp += amplNoise / nu**alpha
     
     return temp
 
@@ -72,7 +72,7 @@ plt.plot(nu[:N//2], np.abs(filtF[:N//2]), '-', label='spherical')
 
 #  ------------------------------------------  filter  -----------------------------------------  #
 
-filename = "Configurations/s_T%.4f_dt%.4f_a%.4f_K%.4f_r%d.txt" % (Tfin,Delta_t,alpha,0,0)
+filename = "Configurations/s_T%.4f_dt%.4f_a%.4f_A%.2e_K%.4f_r%d.txt" % (Tfin,Delta_t,alpha,amplNoise,K,0)
 filt = np.loadtxt(filename)
 
 # find eta
@@ -116,7 +116,7 @@ plt.ylabel(r"amplitude")
 plt.xlim((-1,35))
 plt.ylim((-0.01,0.9))
 
-plt.title(r"$T$=%.2f $\mu$s, $\Delta t$=%.2f $\mu$s, $\alpha$=%.2f; $\eta^{-1}$=%.2f" % (Tfin,Delta_t,alpha, etaInv))
+plt.title(r"$T$=%.2f $\mu$s, $\Delta t$=%.2f $\mu$s, $\alpha$=%.2f, $A$=%.4f; $\eta^{-1}$=%.2f" % (Tfin,Delta_t,alpha,amplNoise,etaInv))
 
 plt.legend(loc="upper right")
 plt.show()
